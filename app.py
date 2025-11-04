@@ -11,23 +11,51 @@ st.set_page_config(page_title="Census Mapper & Extractor", layout="wide")
 # Hide Streamlit Cloud "Manage app" button and menu
 hide_streamlit_style = """
     <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    .stDeployButton {display:none !important;}
-    button[title="Manage app"] {display:none !important;}
-    button[kind="header"] {display:none !important;}
-    div[data-testid="stToolbar"] {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    div[data-testid="stDecoration"] {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    div[data-testid="stHeader"] {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    #stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    #stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    #MainMenu {visibility: hidden !important; display: none !important;}
+    footer {visibility: hidden !important; display: none !important;}
+    header {visibility: hidden !important; display: none !important;}
+    .stDeployButton {display:none !important; visibility: hidden !important;}
+    button[title="Manage app"] {display:none !important; visibility: hidden !important;}
+    button[kind="header"] {display:none !important; visibility: hidden !important;}
+    div[data-testid="stToolbar"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    div[data-testid="stDecoration"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    div[data-testid="stHeader"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    #stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    #stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
     section[data-testid="stSidebar"] > div {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    .stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    .stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    iframe[title="Manage app"] {display: none !important;}
-    a[title="Manage app"] {display: none !important;}
+    .stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    .stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    iframe[title="Manage app"] {display: none !important; visibility: hidden !important;}
+    a[title="Manage app"] {display: none !important; visibility: hidden !important;}
+    /* Target any element containing "Manage app" text */
+    *:contains("Manage app") {display: none !important; visibility: hidden !important;}
+    /* Hide Streamlit Cloud specific elements */
+    [class*="stDeployButton"] {display: none !important; visibility: hidden !important;}
+    [id*="deploy"] {display: none !important; visibility: hidden !important;}
     </style>
+    <script>
+    // Additional JavaScript to hide Manage app button
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            // Hide by text content
+            var elements = document.querySelectorAll('*');
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].textContent && elements[i].textContent.includes('Manage app')) {
+                    elements[i].style.display = 'none';
+                    elements[i].style.visibility = 'hidden';
+                }
+            }
+            // Hide buttons in toolbar
+            var buttons = document.querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].textContent && buttons[i].textContent.includes('Manage')) {
+                    buttons[i].style.display = 'none';
+                    buttons[i].style.visibility = 'hidden';
+                }
+            }
+        }, 100);
+    });
+    </script>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.title("📊 Census Mapper & Extractor")
