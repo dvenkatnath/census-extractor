@@ -27,34 +27,84 @@ hide_streamlit_style = """
     .stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
     iframe[title="Manage app"] {display: none !important; visibility: hidden !important;}
     a[title="Manage app"] {display: none !important; visibility: hidden !important;}
-    /* Target any element containing "Manage app" text */
-    *:contains("Manage app") {display: none !important; visibility: hidden !important;}
     /* Hide Streamlit Cloud specific elements */
     [class*="stDeployButton"] {display: none !important; visibility: hidden !important;}
     [id*="deploy"] {display: none !important; visibility: hidden !important;}
+    /* Target footer elements specifically */
+    footer[data-testid] {display: none !important; visibility: hidden !important;}
+    div[class*="footer"] {display: none !important; visibility: hidden !important;}
+    /* Hide any element with "Manage app" in any form */
+    a[href*="manage"], button[aria-label*="Manage"], div[aria-label*="Manage"] {display: none !important; visibility: hidden !important;}
     </style>
     <script>
-    // Additional JavaScript to hide Manage app button
+    // Aggressive JavaScript to hide Manage app button
+    function hideManageApp() {
+        // Hide by text content - search all elements
+        var allElements = document.querySelectorAll('*');
+        for (var i = 0; i < allElements.length; i++) {
+            var el = allElements[i];
+            if (el.textContent && (el.textContent.includes('Manage app') || el.textContent.includes('Manage'))) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.opacity = '0';
+                el.style.height = '0';
+                el.style.width = '0';
+                el.style.overflow = 'hidden';
+            }
+        }
+        
+        // Hide all buttons
+        var buttons = document.querySelectorAll('button');
+        for (var i = 0; i < buttons.length; i++) {
+            var btn = buttons[i];
+            if (btn.textContent && btn.textContent.includes('Manage')) {
+                btn.style.display = 'none';
+                btn.style.visibility = 'hidden';
+                btn.style.opacity = '0';
+            }
+        }
+        
+        // Hide all links
+        var links = document.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            if (link.textContent && link.textContent.includes('Manage')) {
+                link.style.display = 'none';
+                link.style.visibility = 'hidden';
+                link.style.opacity = '0';
+            }
+        }
+        
+        // Hide footer elements
+        var footers = document.querySelectorAll('footer');
+        for (var i = 0; i < footers.length; i++) {
+            footers[i].style.display = 'none';
+            footers[i].style.visibility = 'hidden';
+            footers[i].style.height = '0';
+        }
+        
+        // Hide divs with specific classes or IDs
+        var deployDivs = document.querySelectorAll('[class*="deploy"], [id*="deploy"], [class*="footer"], [id*="footer"]');
+        for (var i = 0; i < deployDivs.length; i++) {
+            deployDivs[i].style.display = 'none';
+            deployDivs[i].style.visibility = 'hidden';
+        }
+    }
+    
+    // Run immediately and on multiple events
+    hideManageApp();
     window.addEventListener('load', function() {
-        setTimeout(function() {
-            // Hide by text content
-            var elements = document.querySelectorAll('*');
-            for (var i = 0; i < elements.length; i++) {
-                if (elements[i].textContent && elements[i].textContent.includes('Manage app')) {
-                    elements[i].style.display = 'none';
-                    elements[i].style.visibility = 'hidden';
-                }
-            }
-            // Hide buttons in toolbar
-            var buttons = document.querySelectorAll('button');
-            for (var i = 0; i < buttons.length; i++) {
-                if (buttons[i].textContent && buttons[i].textContent.includes('Manage')) {
-                    buttons[i].style.display = 'none';
-                    buttons[i].style.visibility = 'hidden';
-                }
-            }
-        }, 100);
+        hideManageApp();
+        setTimeout(hideManageApp, 100);
+        setTimeout(hideManageApp, 500);
+        setTimeout(hideManageApp, 1000);
     });
+    
+    // Also run on DOM mutations (when Streamlit adds elements dynamically)
+    var observer = new MutationObserver(function(mutations) {
+        hideManageApp();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
     </script>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
