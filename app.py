@@ -7,6 +7,19 @@ from llm_extractor import extract_with_full_context, produce_stats_for_llm
 
 load_dotenv()
 st.set_page_config(page_title="Census Mapper & Extractor", layout="wide")
+
+# Hide Streamlit Cloud "Manage app" button and menu
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {display:none;}
+    div[data-testid="stToolbar"] {visibility: hidden; height: 0rem;}
+    div[data-testid="stDecoration"] {visibility: hidden; height: 0rem;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.title("📊 Census Mapper & Extractor")
 
 # Extraction Mode Selection
