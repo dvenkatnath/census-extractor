@@ -1,4 +1,5 @@
 import streamlit as st, pandas as pd, os, json, io
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 from mapper import build_mapping, store_successful_mapping
 from hunter import extract_data, produce_stats
