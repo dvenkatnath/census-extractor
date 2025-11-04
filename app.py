@@ -8,48 +8,48 @@ from llm_extractor import extract_with_full_context, produce_stats_for_llm
 load_dotenv()
 st.set_page_config(page_title="Census Mapper & Extractor", layout="wide")
 
-# Inject script immediately in head to hide Manage app button before page renders
-st.markdown("""
+# Inject script immediately to hide Manage app button - runs before page render
+components.html("""
 <script>
 (function() {
-    function hideManage() {
-        // Remove from DOM immediately
-        var walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-        var node;
-        while (node = walker.nextNode()) {
-            if (node.nodeType === Node.TEXT_NODE) {
-                if (node.textContent && node.textContent.includes('Manage app')) {
-                    var parent = node.parentElement;
-                    if (parent) {
-                        parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:absolute!important;left:-9999px!important;z-index:-9999!important;';
-                        parent.remove();
-                    }
-                }
-            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                var text = node.textContent || node.innerText || '';
-                if (text.includes('Manage app') || text.includes('Manage')) {
-                    node.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:absolute!important;left:-9999px!important;z-index:-9999!important;';
-                    node.remove();
-                }
+    function hideManageApp() {
+        // Method 1: Remove all elements with "Manage app" text
+        var all = document.querySelectorAll('*');
+        for (var i = 0; i < all.length; i++) {
+            var el = all[i];
+            var txt = (el.textContent || el.innerText || '').trim();
+            if (txt === 'Manage app' || txt.includes('Manage app')) {
+                el.remove();
             }
         }
-        // Hide all footers
-        document.querySelectorAll('footer').forEach(f => {
-            f.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:fixed!important;bottom:-9999px!important;z-index:-9999!important;';
-            f.remove();
+        // Method 2: Hide all footers and bottom-right elements
+        document.querySelectorAll('footer, [class*="footer"], [id*="footer"]').forEach(function(el) {
+            el.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:fixed!important;bottom:-9999px!important;z-index:-9999!important;';
+            el.remove();
+        });
+        // Method 3: Hide fixed positioned elements in bottom right
+        document.querySelectorAll('*').forEach(function(el) {
+            var style = window.getComputedStyle(el);
+            if (style.position === 'fixed' && (style.bottom === '0px' || style.right === '0px')) {
+                var txt = (el.textContent || el.innerText || '').trim();
+                if (txt.includes('Manage') || txt.includes('manage')) {
+                    el.remove();
+                }
+            }
         });
     }
-    if (document.body) hideManage();
-    setInterval(hideManage, 100);
-    new MutationObserver(hideManage).observe(document.body || document.documentElement, {childList:true, subtree:true});
+    // Run immediately
+    if (document.body) hideManageApp();
+    else document.addEventListener('DOMContentLoaded', hideManageApp);
+    // Run continuously
+    setInterval(hideManageApp, 50);
+    // Watch for changes
+    if (document.body) {
+        new MutationObserver(hideManageApp).observe(document.body, {childList:true, subtree:true, attributes:true});
+    }
 })();
 </script>
-""", unsafe_allow_html=True)
+""", height=0)
 
 # Hide Streamlit Cloud "Manage app" button and menu - Ultra aggressive approach
 hide_streamlit_style = """
