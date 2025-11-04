@@ -7,12 +7,11 @@ import csv
 from groq import Groq
 from tkinter import Tk, filedialog
 import os
+from dotenv import load_dotenv
 
 # =========================================================
 # CONFIGURATION
 # =========================================================
-import os
-from dotenv import load_dotenv
 load_dotenv()
 api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
