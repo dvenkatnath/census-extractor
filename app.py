@@ -14,9 +14,19 @@ hide_streamlit_style = """
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    .stDeployButton {display:none;}
-    div[data-testid="stToolbar"] {visibility: hidden; height: 0rem;}
-    div[data-testid="stDecoration"] {visibility: hidden; height: 0rem;}
+    .stDeployButton {display:none !important;}
+    button[title="Manage app"] {display:none !important;}
+    button[kind="header"] {display:none !important;}
+    div[data-testid="stToolbar"] {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    div[data-testid="stDecoration"] {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    div[data-testid="stHeader"] {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    #stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    #stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    section[data-testid="stSidebar"] > div {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    .stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    .stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important;}
+    iframe[title="Manage app"] {display: none !important;}
+    a[title="Manage app"] {display: none !important;}
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)

@@ -1,7 +1,7 @@
 [ui]
 # Hide the menu and footer
-hideTopBar = false
-hideSidebarNav = false
+hideTopBar = true
+hideSidebarNav = true
 
 [browser]
 # Don't gather usage stats
