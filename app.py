@@ -8,103 +8,173 @@ from llm_extractor import extract_with_full_context, produce_stats_for_llm
 load_dotenv()
 st.set_page_config(page_title="Census Mapper & Extractor", layout="wide")
 
-# Hide Streamlit Cloud "Manage app" button and menu
+# Hide Streamlit Cloud "Manage app" button and menu - Ultra aggressive approach
 hide_streamlit_style = """
     <style>
-    #MainMenu {visibility: hidden !important; display: none !important;}
-    footer {visibility: hidden !important; display: none !important;}
-    header {visibility: hidden !important; display: none !important;}
-    .stDeployButton {display:none !important; visibility: hidden !important;}
-    button[title="Manage app"] {display:none !important; visibility: hidden !important;}
+    /* Hide all Streamlit UI elements */
+    #MainMenu {visibility: hidden !important; display: none !important; height: 0 !important; width: 0 !important; overflow: hidden !important;}
+    footer {visibility: hidden !important; display: none !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: fixed !important; bottom: -9999px !important;}
+    header {visibility: hidden !important; display: none !important; height: 0 !important; width: 0 !important; overflow: hidden !important;}
+    .stDeployButton {display:none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: absolute !important; left: -9999px !important;}
+    button[title="Manage app"] {display:none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: absolute !important; left: -9999px !important;}
     button[kind="header"] {display:none !important; visibility: hidden !important;}
-    div[data-testid="stToolbar"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    div[data-testid="stToolbar"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important; position: fixed !important; bottom: -9999px !important;}
     div[data-testid="stDecoration"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
     div[data-testid="stHeader"] {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
     #stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
-    #stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    #stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important; position: fixed !important; bottom: -9999px !important; z-index: -9999 !important;}
     section[data-testid="stSidebar"] > div {visibility: hidden !important; height: 0rem !important; display: none !important;}
-    .stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
+    .stApp > footer {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important; position: fixed !important; bottom: -9999px !important; z-index: -9999 !important;}
     .stApp > header {visibility: hidden !important; height: 0rem !important; display: none !important; max-height: 0 !important; overflow: hidden !important;}
-    iframe[title="Manage app"] {display: none !important; visibility: hidden !important;}
-    a[title="Manage app"] {display: none !important; visibility: hidden !important;}
+    iframe[title="Manage app"] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important;}
+    a[title="Manage app"] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important;}
     /* Hide Streamlit Cloud specific elements */
-    [class*="stDeployButton"] {display: none !important; visibility: hidden !important;}
-    [id*="deploy"] {display: none !important; visibility: hidden !important;}
+    [class*="stDeployButton"] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; z-index: -9999 !important;}
+    [id*="deploy"] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; z-index: -9999 !important;}
     /* Target footer elements specifically */
-    footer[data-testid] {display: none !important; visibility: hidden !important;}
-    div[class*="footer"] {display: none !important; visibility: hidden !important;}
+    footer[data-testid] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; position: fixed !important; bottom: -9999px !important; z-index: -9999 !important;}
+    div[class*="footer"] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; position: fixed !important; bottom: -9999px !important; z-index: -9999 !important;}
     /* Hide any element with "Manage app" in any form */
-    a[href*="manage"], button[aria-label*="Manage"], div[aria-label*="Manage"] {display: none !important; visibility: hidden !important;}
+    a[href*="manage"], button[aria-label*="Manage"], div[aria-label*="Manage"] {display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; z-index: -9999 !important;}
+    /* Target bottom right corner specifically */
+    div[style*="bottom"], div[style*="right"] {position: relative !important;}
+    /* Hide any fixed positioned elements in bottom right */
+    div[style*="position: fixed"][style*="bottom"], 
+    div[style*="position:fixed"][style*="bottom"],
+    a[style*="position: fixed"][style*="bottom"],
+    a[style*="position:fixed"][style*="bottom"],
+    button[style*="position: fixed"][style*="bottom"],
+    button[style*="position:fixed"][style*="bottom"] {
+        display: none !important; 
+        visibility: hidden !important; 
+        height: 0 !important; 
+        width: 0 !important; 
+        position: absolute !important; 
+        left: -9999px !important; 
+        z-index: -9999 !important;
+    }
     </style>
     <script>
-    // Aggressive JavaScript to hide Manage app button
-    function hideManageApp() {
-        // Hide by text content - search all elements
-        var allElements = document.querySelectorAll('*');
-        for (var i = 0; i < allElements.length; i++) {
-            var el = allElements[i];
-            if (el.textContent && (el.textContent.includes('Manage app') || el.textContent.includes('Manage'))) {
-                el.style.display = 'none';
-                el.style.visibility = 'hidden';
-                el.style.opacity = '0';
-                el.style.height = '0';
-                el.style.width = '0';
-                el.style.overflow = 'hidden';
+    (function() {
+        'use strict';
+        // Ultra-aggressive function to hide Manage app button
+        function hideManageApp() {
+            try {
+                // Method 1: Hide by text content - search all elements
+                var allElements = document.querySelectorAll('*');
+                for (var i = 0; i < allElements.length; i++) {
+                    var el = allElements[i];
+                    var text = el.textContent || el.innerText || '';
+                    if (text.includes('Manage app') || text.includes('Manage') || text.includes('manage')) {
+                        el.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: absolute !important; left: -9999px !important; z-index: -9999 !important;';
+                        if (el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    }
+                }
+                
+                // Method 2: Hide all buttons with Manage text
+                var buttons = document.querySelectorAll('button, a, div, span');
+                for (var i = 0; i < buttons.length; i++) {
+                    var btn = buttons[i];
+                    var text = btn.textContent || btn.innerText || btn.getAttribute('title') || btn.getAttribute('aria-label') || '';
+                    if (text.includes('Manage') || text.includes('manage')) {
+                        btn.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: absolute !important; left: -9999px !important; z-index: -9999 !important;';
+                        try {
+                            if (btn.parentNode) {
+                                btn.parentNode.removeChild(btn);
+                            }
+                        } catch(e) {}
+                    }
+                }
+                
+                // Method 3: Hide all footer elements
+                var footers = document.querySelectorAll('footer, [class*="footer"], [id*="footer"]');
+                for (var i = 0; i < footers.length; i++) {
+                    footers[i].style.cssText = 'display: none !important; visibility: hidden !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: fixed !important; bottom: -9999px !important; z-index: -9999 !important;';
+                }
+                
+                // Method 4: Hide elements in bottom right corner (fixed position, bottom right)
+                var fixedElements = document.querySelectorAll('[style*="position"], [style*="bottom"], [style*="right"]');
+                for (var i = 0; i < fixedElements.length; i++) {
+                    var el = fixedElements[i];
+                    var style = el.getAttribute('style') || '';
+                    var computed = window.getComputedStyle(el);
+                    if ((computed.position === 'fixed' || computed.position === 'absolute') && 
+                        (computed.bottom === '0px' || computed.bottom === '0' || computed.right === '0px' || computed.right === '0')) {
+                        var text = el.textContent || el.innerText || '';
+                        if (text.includes('Manage') || text.includes('manage') || style.includes('bottom')) {
+                            el.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; overflow: hidden !important; position: absolute !important; left: -9999px !important; z-index: -9999 !important;';
+                            try {
+                                if (el.parentNode) {
+                                    el.parentNode.removeChild(el);
+                                }
+                            } catch(e) {}
+                        }
+                    }
+                }
+                
+                // Method 5: Remove elements from DOM entirely
+                var allNodes = document.querySelectorAll('*');
+                for (var i = 0; i < allNodes.length; i++) {
+                    var node = allNodes[i];
+                    var text = node.textContent || node.innerText || '';
+                    if (text.trim() === 'Manage app' || text.trim() === 'Manage') {
+                        try {
+                            node.parentNode && node.parentNode.removeChild(node);
+                        } catch(e) {}
+                    }
+                }
+            } catch(e) {
+                console.log('Error hiding Manage app:', e);
             }
         }
         
-        // Hide all buttons
-        var buttons = document.querySelectorAll('button');
-        for (var i = 0; i < buttons.length; i++) {
-            var btn = buttons[i];
-            if (btn.textContent && btn.textContent.includes('Manage')) {
-                btn.style.display = 'none';
-                btn.style.visibility = 'hidden';
-                btn.style.opacity = '0';
-            }
+        // Run immediately
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', hideManageApp);
+        } else {
+            hideManageApp();
         }
         
-        // Hide all links
-        var links = document.querySelectorAll('a');
-        for (var i = 0; i < links.length; i++) {
-            var link = links[i];
-            if (link.textContent && link.textContent.includes('Manage')) {
-                link.style.display = 'none';
-                link.style.visibility = 'hidden';
-                link.style.opacity = '0';
-            }
+        // Run on window load
+        window.addEventListener('load', function() {
+            hideManageApp();
+            setTimeout(hideManageApp, 50);
+            setTimeout(hideManageApp, 100);
+            setTimeout(hideManageApp, 200);
+            setTimeout(hideManageApp, 500);
+            setTimeout(hideManageApp, 1000);
+            setTimeout(hideManageApp, 2000);
+        });
+        
+        // Continuous monitoring with MutationObserver
+        var observer = new MutationObserver(function(mutations) {
+            hideManageApp();
+        });
+        
+        // Start observing
+        if (document.body) {
+            observer.observe(document.body, { 
+                childList: true, 
+                subtree: true, 
+                attributes: true,
+                attributeFilter: ['style', 'class', 'id']
+            });
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                observer.observe(document.body, { 
+                    childList: true, 
+                    subtree: true, 
+                    attributes: true,
+                    attributeFilter: ['style', 'class', 'id']
+                });
+            });
         }
         
-        // Hide footer elements
-        var footers = document.querySelectorAll('footer');
-        for (var i = 0; i < footers.length; i++) {
-            footers[i].style.display = 'none';
-            footers[i].style.visibility = 'hidden';
-            footers[i].style.height = '0';
-        }
-        
-        // Hide divs with specific classes or IDs
-        var deployDivs = document.querySelectorAll('[class*="deploy"], [id*="deploy"], [class*="footer"], [id*="footer"]');
-        for (var i = 0; i < deployDivs.length; i++) {
-            deployDivs[i].style.display = 'none';
-            deployDivs[i].style.visibility = 'hidden';
-        }
-    }
-    
-    // Run immediately and on multiple events
-    hideManageApp();
-    window.addEventListener('load', function() {
-        hideManageApp();
-        setTimeout(hideManageApp, 100);
-        setTimeout(hideManageApp, 500);
-        setTimeout(hideManageApp, 1000);
-    });
-    
-    // Also run on DOM mutations (when Streamlit adds elements dynamically)
-    var observer = new MutationObserver(function(mutations) {
-        hideManageApp();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+        // Also run on interval as backup
+        setInterval(hideManageApp, 1000);
+    })();
     </script>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
