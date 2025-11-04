@@ -8,6 +8,49 @@ from llm_extractor import extract_with_full_context, produce_stats_for_llm
 load_dotenv()
 st.set_page_config(page_title="Census Mapper & Extractor", layout="wide")
 
+# Inject script immediately in head to hide Manage app button before page renders
+st.markdown("""
+<script>
+(function() {
+    function hideManage() {
+        // Remove from DOM immediately
+        var walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        var node;
+        while (node = walker.nextNode()) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                if (node.textContent && node.textContent.includes('Manage app')) {
+                    var parent = node.parentElement;
+                    if (parent) {
+                        parent.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:absolute!important;left:-9999px!important;z-index:-9999!important;';
+                        parent.remove();
+                    }
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                var text = node.textContent || node.innerText || '';
+                if (text.includes('Manage app') || text.includes('Manage')) {
+                    node.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:absolute!important;left:-9999px!important;z-index:-9999!important;';
+                    node.remove();
+                }
+            }
+        }
+        // Hide all footers
+        document.querySelectorAll('footer').forEach(f => {
+            f.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;width:0!important;position:fixed!important;bottom:-9999px!important;z-index:-9999!important;';
+            f.remove();
+        });
+    }
+    if (document.body) hideManage();
+    setInterval(hideManage, 100);
+    new MutationObserver(hideManage).observe(document.body || document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+""", unsafe_allow_html=True)
+
 # Hide Streamlit Cloud "Manage app" button and menu - Ultra aggressive approach
 hide_streamlit_style = """
     <style>
